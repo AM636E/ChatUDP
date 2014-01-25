@@ -50,7 +50,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chat1\Common\Common.csproj">
+    <ProjectReference Include="..\Common\Common.csproj">
       <Project>{cec106c6-9942-451a-b196-13f50e70dc9a}</Project>
       <Name>Common</Name>
     </ProjectReference>

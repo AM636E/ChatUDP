@@ -55,13 +55,13 @@
     <Compile Include="UnitTest2.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chat1\Common\Common.csproj">
-      <Project>{cec106c6-9942-451a-b196-13f50e70dc9a}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Chat\Server.csproj">
       <Project>{597cf6f1-c55d-417f-9b1c-7ab788abf21c}</Project>
       <Name>Server</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{cec106c6-9942-451a-b196-13f50e70dc9a}</Project>
+      <Name>Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
