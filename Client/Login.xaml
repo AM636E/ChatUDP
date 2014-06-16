@@ -1,0 +1,16 @@
+﻿<Window x:Class="Client.Login"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Login" Height="300" Width="300">
+    <Grid>
+        <StackPanel>
+            <TextBlock>Login</TextBlock>
+            <TextBox Name="_login"></TextBox>
+            <TextBlock>IP</TextBlock>
+            <TextBox Name="_ip">127.0.0.1</TextBox>
+            <TextBlock>Port</TextBlock>
+            <TextBox Name="_port">1000</TextBox>
+            <Button Click="Button_Click">Login</Button>
+        </StackPanel>
+    </Grid>
+</Window>

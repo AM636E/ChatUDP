@@ -12,5 +12,7 @@ namespace Common
     {
         public EndPoint Adress { get; set; }
         public string Login { get; set; }
+
+        public static readonly ClientInfo Empty;
     }
 }

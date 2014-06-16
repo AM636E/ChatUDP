@@ -62,25 +62,33 @@ namespace Chat
                 Data received = new Data(_data);
                 Data toSend = null;
                 Console.WriteLine("received {0}", received);
+                var client = new ClientInfo() { Login = received.ClientLogin, Adress = sender };
                 switch(received.Command)
                 {
                     case Command.Login:
                         {
                             if (IsLoginFree(received.ClientLogin))
                             {
-                                _clients.Add(new ClientInfo() { Adress = sender, Login = received.ClientLogin });
-                                toSend = new Data() { Status = Status.OK, Command = Command.Login, ClientLogin = "test", Message = "test" };
+                                _clients.Add(client);
+                                SendDataToClient(client, Status.OK);
+                                toSend = new Data() { Command = Command.None, Status = Status.OK, Message = received.ClientLogin + " has joined to the room", ClientLogin = "_login" };
                             }
                             else
                             {
-                                toSend = new Data() { Status = Status.LOGIN_TAKEN, Command = Command.Login, ClientLogin = "test", Message = "test" };
+                                SendDataToClient(client, Status.LOGIN_TAKEN);
                             }
                             break;
                         }
+                    case Command.Message :
+                        {
+                            toSend = new Data() { Command = Command.Message, Status = Status.OK, Message = received.Message, ClientLogin = received.ClientLogin };
+                            break;
+                        }
                 }
-
-                byte[] message = toSend.ToBytes();
-                _server.BeginSendTo(message, 0, message.Length, SocketFlags.None, sender, OnSend, null);
+                if (toSend != null)
+                {
+                    SendDataToClients(toSend);
+                }
                 _server.BeginReceiveFrom(_data, 0, SIZE, SocketFlags.None, ref sender, OnReceive, sender);
             }
             catch (Exception e)
@@ -90,6 +98,33 @@ namespace Chat
             
         }
 
+        public void SendDataToClients(Data data)
+        {
+            foreach(ClientInfo client in _clients)
+            {
+                SendDataToClient(client, data);
+            }
+        }
+
+        public void SendDataToClients(Status status, Command command, string message = "fake", string login = "fake")
+        {
+            SendDataToClients(new Data() { Status = status, Command = command, Message = message, ClientLogin = login });
+        }
+        
+        public void SendDataToClient(ClientInfo client, Data data )
+        {
+            if (data.ClientLogin == null)
+            {
+                data.ClientLogin = client.Login;
+            }
+            var message = data.ToBytes();
+            _server.BeginSendTo(message, 0, message.Length, SocketFlags.None, client.Adress, OnSend, null);
+        }
+
+        public void SendDataToClient(ClientInfo client, Status status, Command command = Command.None, string message = "fake", string login = "fake")
+        {
+            SendDataToClient(client, new Data() { Status = status, Command = command, Message = message, ClientLogin = login });
+        }
         public bool IsLoginFree(string login)
         {
             return (from client in _clients

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LIBRARY>
+	<BOOK>
+		<NAME>Apache</NAME>
+		<PRICE>37</PRICE>
+	</BOOK>
+	<BOOK>
+		<NAME>Perl Cookbook</NAME>
+		<PRICE>49</PRICE>
+	</BOOK>
+	<BOOK>
+		<NAME>JDBC</NAME>
+		<PRICE>27</PRICE>
+	</BOOK>
+	<BOOK>
+		<NAME>Programming SERVLETS</NAME>
+		<PRICE>55</PRICE>
+	</BOOK>
+	<BOOK>
+		<NAME>XML</NAME>
+		<PRICE>35</PRICE>
+	</BOOK>
+</LIBRARY>
+<!-- //////////////////////////////////////// -->

@@ -7,6 +7,7 @@ namespace DataTest
     [TestClass]
     public class DataTest
     {
+        public static Chat.ChatServer server = new Chat.ChatServer();
         [TestMethod]
         public void StatusOK()
         {

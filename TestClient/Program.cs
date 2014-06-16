@@ -13,24 +13,17 @@ namespace TestClient
     {
         static void Main(string[] args)
         {
-            //try
-            //{
-            //    //Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            ChatClient client = new ChatClient("asdf");
 
-            //    //var msg = new Data() { Command = Command.Login, Message = "hello", ClientLogin = "wweor" }.ToBytes();
+            client.Received += (o, e) =>
+            {
+                if (e.received.Command == Command.Message)
+                {
+                    Console.WriteLine("Message from {0} : {1}", e.received.ClientLogin, e.received.Message);
+                }
+            };
 
-            //    //EndPoint server = new IPEndPoint(IPAddress.Loopback, 1000);
-
-            //    //s.BeginSendTo(msg, 0, msg.Length, SocketFlags.None, server, OnSend, null);
-
-            //}
-            //catch (Exception e) 
-            //{
-                
-            //}
-            ChatClient asdfas = new ChatClient("asdf");
-
-            
+            client.SendMessage("Hi all!");
 
             Application.Run(new ApplicationContext());
         }

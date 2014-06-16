@@ -8,6 +8,10 @@ using System.Net.Sockets;
 
 namespace Common
 {
+    public class ChatEventArgs : EventArgs
+    {
+        public Data received { get; set; }
+    }
     public class ChatClient
     {
         private Socket _client;
@@ -15,46 +19,72 @@ namespace Common
         private EndPoint _server;
         private byte[] _data = new byte[1024];
         public byte[] Data { get { return _data; } }
-        public event EventHandler Received;
+        public delegate void ChatEventHandler(object o, ChatEventArgs e);
+        public event ChatEventHandler Received;
+        private int _loginCount = 0;
 
         /// <summary>
-        /// Create a new ChatClient login and start listen to the server
+        /// Create a new ChatClient instance.
+        /// Login and start listen to the server.
         /// </summary>
         /// <param name="login">Login in the room</param>
         /// <param name="ip">Ip of server</param>
         /// <param name="port">Port of server</param>
         public ChatClient(string login, string ip = "127.0.0.1", int port = 1000)
         {
-            _client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-
-            var msg = new Data() { Command = Command.Login, Message = "hello", ClientLogin = login }.ToBytes();
+            _client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);            
 
             EndPoint server = new IPEndPoint(IPAddress.Loopback, 1000);
             _server = server;
             _login = login;
-            _client.BeginSendTo(msg, 0, msg.Length, SocketFlags.None, _server, OnSend, null);
+       
             Login();
         }
 
         private void OnReceive(IAsyncResult ar)
         {
-            try
-            {
                 var a = Received;
+                Data d = new Data(_data);
+            if(d.Status != Status.OK)
+            {
+                throw new Exception("Something happens " + d.Status);
+            }
                 if(a != null)
                 {
-                    a(this, EventArgs.Empty);
+                    a(this, new ChatEventArgs() { received = d });
                 }
-                Data d = new Data(_data);
+                
                 Console.WriteLine(d);
-               // Console.WriteLine(Encoding.UTF8.GetString(_data));
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e);
-            }
+                switch(d.Status)
+                {
+                    case Status.LOGIN_TAKEN :
+                        {
+                            var index = _login.LastIndexOfAny("123456789".ToCharArray());
+                            if(index == -1)
+                            {
+                                _login += (++_loginCount);
+                            }
+                            else
+                            {
+                                _login = _login.Substring(0, index) + (++_loginCount);
+                            }
+                            Login();
+                            break;
+                        }
+                    case Status.RANDOM_SERVER_ERROR:
+                        {
+                            Login();
+                            break;
+                        }
+                }
+                _client.BeginReceiveFrom(_data, 0, _data.Length, SocketFlags.None, ref _server, OnReceive, null);
+           
         }
 
+        public void SendMessage(string message)
+        {
+            SendData(new Data() { Status = Status.OK, ClientLogin = _login, Message = message, Command = Command.Message });
+        }
         public void SendData(Data data)
         {
             byte[] message = data.ToBytes();
@@ -77,7 +107,8 @@ namespace Common
         }
         public void Login()
         {
-            
+            var msg = new Data() { Command = Command.Login, Message = "hello", ClientLogin = _login }.ToBytes();
+            _client.BeginSendTo(msg, 0, msg.Length, SocketFlags.None, _server, OnSend, null);
         }
     }
 }
